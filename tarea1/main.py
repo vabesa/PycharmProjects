@@ -350,3 +350,4 @@ class MenuCrear():
 
     def salir(self):
         self.seguir=False
+MenuPrincipal().run()

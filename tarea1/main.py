@@ -330,9 +330,18 @@ class MenuCrear():
         vehicle=input("Ingrese el vehiculo utilizado")
 
     def crear_ruta(self):
-        1
+        id=input("Ingrese el codigo de la ruta")
+        ciudad1=input("Ingrese la ciudad N°1")
+        ciudad2=input("Ingrese la ciudad N°2")
+        tipo=input("Ingrese el tipo de vehiculos")
+        lenght=input("Ingrese el largo de la ruta")
+        size=input("Ingrese el tamaño que soporta la ruta")
+        cost=input("Ingrese el costo de la ruta")
+
     def crear_vehiculo(self):
-        1
+        modelo=input("Ingrese el modelo del vehiculo")
+        nombre=input("Ingrese el nombre del vehiculo")
+
     def salir(self):
         self.seguir=False
 MenuPrincipal().run()

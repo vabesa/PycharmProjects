@@ -9,6 +9,7 @@ flota={}
 ciudades={}
 rutas={}
 terminales={}
+dciudades={}
 class Iniciar():
     def __init__(self):
         Generar.generar_rutas()
@@ -34,6 +35,7 @@ class Generar():
         #generar diccionario de ciudades
         datos_ciudad=open("cities.txt", "r")
         global ciudades
+        j=0
         i=0
         for linea in datos_ciudad:
             if i==0:
@@ -41,6 +43,8 @@ class Generar():
                 continue
             lista=linea.strip("\n").split("\t")
             ciudades[lista[0]]=Ciudad(lista[0],lista[1])
+            dciudades[lista[0]]=j
+            j+=1
         datos_ciudad.close()
         ## generar terminales
         datos_terminales=open("hubs.txt", "r")

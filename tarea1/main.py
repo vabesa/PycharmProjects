@@ -3,6 +3,12 @@ import sys
 from especificaciones import *
 from iniciar import *
 Iniciar()
+n=len(ciudades)
+matriz_ciudad=[[0]*n for i in range(n)]
+for ruta in rutas:
+    matriz_ciudad[dciudades[rutas[ruta].ciudad1]][dciudades[rutas[ruta].ciudad2]]=1
+    matriz_ciudad[dciudades[rutas[ruta].ciudad2]][dciudades[rutas[ruta].ciudad1]]=1
+
 class MenuPrincipal:
     def __init__(self):
         self.opciones = {
@@ -344,4 +350,3 @@ class MenuCrear():
 
     def salir(self):
         self.seguir=False
-MenuPrincipal().run()

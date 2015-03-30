@@ -3,14 +3,59 @@ class Pasajero():
         self.nombre=nombre
         self.apellido=apellido
         self.RUT=RUT
-        self.itinerarios=[]
+        self.viajes=[]
     def imprimir(self):
         print("nombre: {},apellido: {}, RUT: {}".format(self.nombre,self.apellido,self.RUT))
-        for itinerario in self.itinerarios:
-            itinerario.imprimir()
         print("-----------------------------------------------------------------------------------------------------")
-    def agregar_itinerario(self,itineario):
-        self.itinerarios.append(itineario)
+    def agregar_viaje(self,viaje):
+        self.viajes.append(viaje)
+    def obtener_ubicacion(self,fecha,hora):
+        lista=fecha.split('/')
+        lista2=hora.split(':')
+        dia=int(lista[0])+int(lista[1])*30+int(lista[2])*30*12
+        hora_min=int(lista2[0])*60+int(lista2[1])
+        minutos_ingresados=dia*24*60+hora_min
+        k=0
+        primera=True
+        ultimos_minutos=0
+        for i in range(len(self.viajes)):
+            fecha_hora=self.viajes[i].hora_partida
+            fecha_hora=fecha_hora.split("-")
+            fecha=fecha_hora[0].split('/')
+            hora=fecha_hora[1].split(':')
+            minutos_vuelo=(int(fecha[0])+int(fecha[1])*30+int(fecha[2])*30*12)*24*60+int(hora[0])*60+int(hora[1])
+            if minutos_ingresados>=minutos_vuelo and minutos_ingresados<=minutos_vuelo+60*self.viajes[i].tiempo:
+                k=i
+                return [k,"ENTRE"]
+            if minutos_ingresados>=minutos_vuelo and minutos_vuelo>ultimos_minutos:
+                ultimos_minutos=minutos_vuelo
+                k=i
+                primera=False
+        return [k,primera]
+    def obtener_distancia(self,fecha,hora):
+        lista=fecha.split('/')
+        lista2=hora.split(':')
+        dia=int(lista[0])+int(lista[1])*30+int(lista[2])*30*12
+        hora_min=int(lista2[0])*60+int(lista2[1])
+        minutos_ingresados=dia*24*60+hora_min
+        distancia=0
+        for i in range(len(self.viajes)):
+            fecha_hora=self.viajes[i].hora_partida
+            fecha_hora=fecha_hora.split("-")
+            fecha=fecha_hora[0].split('/')
+            hora=fecha_hora[1].split(':')
+            minutos_vuelo=(int(fecha[0])+int(fecha[1])*30+int(fecha[2])*30*12)*24*60+int(hora[0])*60+int(hora[1])
+            if minutos_ingresados>=minutos_vuelo and minutos_ingresados<=minutos_vuelo+self.viajes[i].tiempo:
+                distancia+=(minutos_vuelo+self.viajes[i].tiempo-minutos_ingresados)*self.viajes[i].velocidad/60
+            elif minutos_ingresados>=minutos_vuelo:
+                distancia+=self.viajes[i].largo
+        print("El pasajero de RUT {} ha recorrido {} km".format(self.RUT,distancia))
+    def imprimir_itinerario(self):
+        print("Los viaje para el pasajero de RUT: {} son".format(self.RUT))
+        for viaje in self.viajes:
+            viaje.imprimir()
+            print("Costo: {}".format(viaje.costo_base))
+            print("-----------------------------------------------------------------------------------------------")
 
 
 class Itinerario():
@@ -29,14 +74,40 @@ class Carga():
         self.peso=peso
         self.volumen=volumen
         self.tipo=tipo
-        self.itinerarios=[]
+        self.viajes=[]
     def imprimir(self):
         print("Nombre: {}, Peso: {}, Volumen: {}, Tipo: {}".format(self.nombre,self.peso,self.volumen,self.tipo))
-        for itinerario in self.itinerarios:
-            itinerario.imprimir()
         print("-----------------------------------------------------------------------------------------------------")
-    def agregar_itinerario(self,itinerario):
-        self.itinerarios.append(itinerario)
+    def agregar_viaje(self,viaje):
+        self.viajes.append(viaje)
+    def obtener_ubicacion(self,fecha,hora):
+        lista=fecha.split('/')
+        lista2=hora.split(':')
+        dia=int(lista[0])+int(lista[1])*30+int(lista[2])*30*12
+        hora_min=int(lista2[0])*60+int(lista2[1])
+        minutos_ingresados=dia*24*60+hora_min
+        k=0
+        primera=True
+        ultimos_minutos=0
+        for i in range(len(self.viajes)):
+            fecha_hora=self.viajes[i].hora_partida
+            fecha_hora=fecha_hora.split("-")
+            fecha=fecha_hora[0].split('/')
+            hora=fecha_hora[1].split(':')
+            print(hora)
+            minutos_vuelo=(int(fecha[0])+int(fecha[1])*30+int(fecha[2])*30*12)*24*60+int(hora[0])*60+int(hora[1])
+            if minutos_ingresados>=minutos_vuelo and minutos_ingresados<=minutos_vuelo+self.viajes[i].tiempo*60:
+                return [k,"ENTRE"]
+            if minutos_ingresados>=minutos_vuelo and minutos_vuelo>ultimos_minutos:
+                ultimos_minutos=minutos_vuelo
+                k=i
+                primera=False
+        return [k,primera]
+    def imprimir_itinerario(self):
+        print("Los viajes para la carga de id {} son".format(self.id))
+        for viaje in self.viajes:
+            viaje.imprimir()
+        print("Costo: {}".format(viaje.costo_base*max(float(self.peso)/100,float(self.volumen))))
 
 
 class Terminal():
@@ -50,14 +121,16 @@ class Terminal():
 
 
 class Ruta():
-    def __init__(self,ciudades,nombre,tipo_vehiculos,largo,multiplicador_costo):
-        self.ciudades=ciudades
+    def __init__(self,ciudad1,ciudad2,nombre,tipo_vehiculos,largo,tamaño,multiplicador_costo):
+        self.ciudad1=ciudad1
+        self.ciudad2=ciudad2
         self.nombre=nombre
         self.tipo_vehiculos=tipo_vehiculos
         self.largo=largo
+        self.tamaño=tamaño
         self.multiplicador_costo=multiplicador_costo
     def imprimir(self):
-        print("Ciudades: {} y {}, nombre: {}, tipo de vehiculos que soporta: {}, largo de la ruta: {}, multiplicador de costo: {}".format(self.ciudades[0],self.ciudades[1],self.nombre,self.tipo_vehiculos,self.largo,self.multiplicador_costo))
+        print("Ciudades: {} y {}, nombre: {}, tipo de vehiculos que soporta: {}, largo de la ruta: {}, multiplicador de costo: {}".format(self.ciudad1,self.ciudad2,self.nombre,self.tipo_vehiculos,self.largo,self.multiplicador_costo))
 
 
 class TransporteCarga():
@@ -79,14 +152,58 @@ class TransportePasajeros():
 
 
 class Vehiculo():
+
     def __init__(self,nombre,tipo,tamaño,velocidad,costo_transporte):
         self.nombre=nombre
         self.tipo=tipo
         self.tamaño=tamaño
         self.velocidad=velocidad
         self.costo_transporte=costo_transporte
+        self.viajes=[]
     def imprimir(self):
         print("Nombre: {}, Tipo de vehiculo: {}, Tamaño: {}, Velocidad: {}, Costo de transporte: {}".format(self.nombre,self.tipo,self.tamaño,self.velocidad,self.costo_transporte))
+    def agregar_viaje(self,viaje):
+        self.viajes.append(viaje)
+    def obtener_ubicacion(self,fecha,hora):
+        lista=fecha.split('/')
+        lista2=hora.split(':')
+        dia=int(lista[0])+int(lista[1])*30+int(lista[2])*30*12
+        hora_min=int(lista2[0])*60+int(lista2[1])
+        minutos_ingresados=dia*24*60+hora_min
+        k=0
+        ultimos_minutos=0
+        primera=True
+        for i in range(len(self.viajes)):
+            fecha_hora=self.viajes[i].hora_partida
+            fecha_hora=fecha_hora.split("-")
+            fecha=fecha_hora[0].split('/')
+            hora=fecha_hora[1].split(':')
+            minutos_vuelo=(int(fecha[0])+int(fecha[1])*30+int(fecha[2])*30*12)*24*60+int(hora[0])*60+int(hora[1])
+            if minutos_ingresados>=minutos_vuelo and minutos_ingresados<=minutos_vuelo+self.viajes[i].tiempo:
+                return [k,"ENTRE"]
+            if minutos_ingresados>=minutos_vuelo and minutos_vuelo>ultimos_minutos:
+                ultimos_minutos=minutos_vuelo
+                k=i
+                primera=False
+        return [k,primera]
+    def obtener_distancia(self,fecha,hora):
+        lista=fecha.split('/')
+        lista2=hora.split(':')
+        dia=int(lista[0])+int(lista[1])*30+int(lista[2])*30*12
+        hora_min=int(lista2[0])*60+int(lista2[1])
+        minutos_ingresados=dia*24*60+hora_min
+        distancia=0
+        for i in range(len(self.viajes)):
+            fecha_hora=self.viajes[i].hora_partida
+            fecha_hora=fecha_hora.split("-")
+            fecha=fecha_hora[0].split('/')
+            hora=fecha_hora[1].split(':')
+            minutos_vuelo=(int(fecha[0])+int(fecha[1])*30+int(fecha[2])*30*12)*24*60+int(hora[0])*60+int(hora[1])
+            if minutos_ingresados>=minutos_vuelo and minutos_ingresados<=minutos_vuelo+self.viajes[i].tiempo:
+                distancia+=(minutos_vuelo+self.viajes[i].tiempo-minutos_ingresados)*self.viajes[i].velocidad/60
+            elif minutos_ingresados>=minutos_vuelo:
+                distancia+=self.viajes[i].largo
+        print("El vehiculo de nombre {} ha recorrido {} km".format(self.nombre,distancia))
 
 
 class Avion(TransporteCarga,TransportePasajeros,Vehiculo):
@@ -142,18 +259,33 @@ class Crucero(TransportePasajeros,Vehiculo):
 
 
 class Viaje():
-    def __init__(self,codigo_viaje,terminal_partida,terminal_llegada,hora_partida,vehiculo_utilizado,ruta_utilizada):
+    def __init__(self,codigo_viaje,terminal_partida,terminal_llegada,hora_partida,vehiculo_utilizado,ruta_utilizada,largo,velocidad,costo_base):
         self.codigo_viaje=codigo_viaje
         self.terminal_partida=terminal_partida
-        self.termina_llegada=terminal_llegada
+        self.terminal_llegada=terminal_llegada
         self.hora_partida=hora_partida
         self.vehiculo_utilizado=vehiculo_utilizado
         self.ruta_utilizada=ruta_utilizada
+        self.tiempo=int(largo)/int(velocidad)
+        self.largo=int(largo)
+        self.velocidad=int(velocidad)
+        self.contenido=[]
+        self.costo_base=costo_base
     def imprimir(self):
         print("Codigo de viaje: {}, Terminal de partida: {}, Terminal de llegada: {}, Hora de partida: {}, Vehiculo utilizado: {}, Ruta utilizada: {}".format(self.codigo_viaje,self.terminal_partida,self.termina_llegada,self.hora_partida,self.vehiculo_utilizado,self.ruta_utilizada))
         print("-----------------------------------------------------------------------------------------------------")
+    def agregar_contenido(self,contenido):
+        self.contenido.append(contenido)
+
 
 class Ciudad():
     def __init__(self,nombre,pais):
         self.nombre=nombre
         self.pais=pais
+        self.terminales=[]
+    def agregar_terminal(self,terminal):
+        self.terminales.append(terminal)
+    def imprimir(self):
+        print("Ciudad: {}, Pais: {}".format(self.nombre,self.pais))
+        for terminal in self.terminales:
+            terminal.imprimir()

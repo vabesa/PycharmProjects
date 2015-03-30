@@ -1,6 +1,8 @@
 from especificaciones import *
 from iniciar import *
+
 Iniciar()
+
 while True:
     print("""
         Menu:
@@ -10,7 +12,7 @@ while True:
             4: Cancelar pasajes agegandos a un objeto
             5: Salir
         """)
-    a=input()
+    a=input("ingrese opcion")
     try:
         pasajeros[a].imprimir()
     except:

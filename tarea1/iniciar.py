@@ -6,8 +6,63 @@ cargas={}
 itinerarios={}
 modelos_vehiculos={}
 flota={}
+ciudades={}
+rutas={}
+terminales={}
 class Iniciar():
     def __init__(self):
+        Generar.generar_rutas()
+        Generar.generar_ciudades()
+        Generar.generar_pasajeros()
+        Generar.generar_cargas()
+        Generar.generar_vehiculos()
+        Generar.generar_viajes()
+        Generar.generar_itinerarios()
+class Generar():
+    def generar_rutas():
+            datos_rutas=open("routes.txt", "r")
+            i=0
+            global rutas
+            for linea in datos_rutas:
+                if i==0:
+                    i=1
+                    continue
+                lista=linea.strip('\n').split('\t')
+                rutas[lista[0]]=Ruta(lista[1],lista[2],lista[0],lista[3],lista[4],lista[5],lista[6])
+            datos_rutas.close()
+    def generar_ciudades():
+        #generar diccionario de ciudades
+        datos_ciudad=open("cities.txt", "r")
+        global ciudades
+        i=0
+        for linea in datos_ciudad:
+            if i==0:
+                i=1
+                continue
+            lista=linea.strip("\n").split("\t")
+            ciudades[lista[0]]=Ciudad(lista[0],lista[1])
+        datos_ciudad.close()
+        ## generar terminales
+        datos_terminales=open("hubs.txt", "r")
+        i=0
+        for linea in datos_terminales:
+            if i==0:
+                i=1
+                continue
+            linea.strip("\n")
+            linea2=linea.split()
+            var_aux1="Airports".split()
+            var_aux2="BusTerminals".split()
+            var_aux3="CargoDepots".split()
+            var_aux4="Harbors".split()
+            if linea2==var_aux1 or linea2==var_aux2 or linea2==var_aux3 or linea2==var_aux4:
+                continue
+
+            lista=linea.strip("\n").split("\t")
+            terminales[lista[0]]=Terminal(lista[0],lista[2],lista[3],lista[1])
+            ciudades[lista[1]].agregar_terminal(terminales[lista[0]])
+        datos_terminales.close()
+    def generar_pasajeros():
         # generar diccionario de pasajeros#
         datos = open("passengers.txt", "r")
         global pasajeros
@@ -19,6 +74,7 @@ class Iniciar():
             lista=linea.strip('\n').split('\t')
             pasajeros[lista[2]]=Pasajero(lista[0],lista[1],lista[2])
         datos.close()
+    def generar_cargas():
         # Generar cargas
         datos_carga=open("cargo.txt", "r")
         global cargas
@@ -30,7 +86,7 @@ class Iniciar():
             lista=linea.strip('\n').split('\t')
             cargas[lista[0]]=Carga(lista[0],lista[1],lista[2],lista[3],lista[4])
         datos_carga.close()
-        # generar viajes
+    def generar_viajes():    # generar viajes
         datos_viajes=open("trips.txt", "r")
         global viajes
         i=0
@@ -39,8 +95,10 @@ class Iniciar():
                 i=1
                 continue
             lista=linea.strip('\n').split('\t')
-            viajes[lista[0]]=Viaje(lista[0],lista[1],lista[2],lista[4],lista[5],lista[3])
+            viajes[lista[0]]=Viaje(lista[0],lista[1],lista[2],lista[4],lista[5],lista[3],rutas[lista[3]].largo,flota[lista[5]].velocidad,float(rutas[lista[3]].multiplicador_costo)*float(flota[lista[5]].costo_transporte)*float(rutas[lista[3]].largo))
+            flota[lista[5]].agregar_viaje(viajes[lista[0]])
         datos_viajes.close()
+    def generar_vehiculos():
         # generar vehiculo
         datos_modelos = open("vehicle_models.txt","r")
         i=0
@@ -137,11 +195,9 @@ class Iniciar():
                 vehiculo_aux=Camion(elemento[3],elemento[4],elemento[5],"Terrestre",lista[1],"Camión",elemento[1],elemento[2],elemento[6])
                 flota[lista[1]]=vehiculo_aux
                 continue
-        flota['A2001'].imprimir()
+        datos_flota.close()
 
-
-
-        # generar itinerarios
+    def generar_itinerarios():        # generar itinerarios
         datos_itinerarios= open("itineraries.txt", "r")
         global itinerarios
         i=0
@@ -153,16 +209,15 @@ class Iniciar():
             id_viajes=lista[1].split(' ')
             viajes_aux=[]
             for id in id_viajes:
-                viajes_aux.append(viajes[id])
-            itinerarios[lista[0]]=Itinerario(lista[0],viajes_aux)
-            try:
-                pasajeros[lista[0]].agregar_itinerario(itinerarios[lista[0]])
-            except:
-                1
-            try:
-                cargas[lista[0]].agregar_itinerario(itinerarios[lista[0]])
-            except:
-                1
-        pasajeros['11.255.036-4'].imprimir()
-        cargas['VmALl'].imprimir()
+                try:
+                    pasajeros[lista[0]].agregar_viaje(viajes[id])
+                    viajes[id].agregar_contenido(pasajeros[lista[0]])
+                except:
+                    1
+                try:
+                    cargas[lista[0]].agregar_viaje(viajes[id])
+                    viajes[id].agregar_contenido(cargas[lista[0]])
+                except:
+                    1
+
         datos_itinerarios.close()

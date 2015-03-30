@@ -17,6 +17,7 @@ def sellega(inicial,final,cont,matriz):
         else:
             matriz_m=multiplicar(matriz_m,matriz)
         if matriz_m[inicial][final]==1:
+            print(i)
             return True
     return False
 cont=0
@@ -24,4 +25,4 @@ for i in range(len(matriz_ciudad)):
     for j in range(len(matriz_ciudad)):
         if matriz_ciudad[i][j]==1:
             cont+=1
-print(sellega(3,52,cont,matriz_ciudad))
+print(sellega(12,51,cont,matriz_ciudad))
